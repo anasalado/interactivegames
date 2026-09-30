@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irregular Verbs Practice</title>
+<style>
+  :root {
+    --bg: #f7f8fb;
+    --card: #ffffff;
+    --text: #1a1d29;
+    --muted: #6b7280;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --correct: #16a34a;
+    --correct-bg: #dcfce7;
+    --wrong: #dc2626;
+    --wrong-bg: #fee2e2;
+    --border: #e5e7eb;
+    --accent: #7c3aed;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14161f;
+      --card: #1e2130;
+      --text: #f0f1f5;
+      --muted: #9ca3af;
+      --border: #333748;
+      --correct-bg: #123321;
+      --wrong-bg: #3a1616;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161f;
+    --card: #1e2130;
+    --text: #f0f1f5;
+    --muted: #9ca3af;
+    --border: #333748;
+    --correct-bg: #123321;
+    --wrong-bg: #3a1616;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    padding: 16px;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  h1 {
+    font-size: 1.4rem;
+    text-align: center;
+    margin: 8px 0 4px;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+  .mode-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .mode-btn {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mode-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .stats {
+    display: flex;
+    justify-content: space-between;
+    max-width: 640px;
+    margin: 0 auto 14px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    padding: 0 4px;
+  }
+  .stats b { color: var(--text); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 20px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .prompt-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .prompt-word {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+  .prompt-forms {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+    min-height: 1.2em;
+  }
+  .prompt-forms .blank {
+    display: inline-block;
+    min-width: 60px;
+    border-bottom: 2px solid var(--primary);
+    color: var(--primary);
+    font-weight: 700;
+  }
+  input[type="text"] {
+    width: 100%;
+    max-width: 320px;
+    padding: 12px 16px;
+    font-size: 1.1rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .choice-btn {
+    padding: 14px 8px;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .choice-btn:hover { border-color: var(--primary); }
+  .choice-btn.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); font-weight: 700; }
+  .choice-btn.wrong { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong); font-weight: 700; }
+  .choice-btn:disabled { cursor: default; opacity: 0.85; }
+  .feedback {
+    min-height: 26px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .feedback.correct { color: var(--correct); }
+  .feedback.wrong { color: var(--wrong); }
+  .actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  button.main-btn {
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  button.main-btn:hover { background: var(--primary-dark); }
+  button.main-btn:disabled { opacity: 0.5; cursor: default; }
+  button.secondary-btn {
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .flip-card {
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .end-screen {
+    text-align: center;
+  }
+  .end-screen .big-score {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 10px 0;
+  }
+  .footer-note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.75rem;
+    margin-top: 20px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.3s;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔁 Irregular Verbs Practice</h1>
+  <div class="subtitle" id="subtitle">Choose a mode to start</div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" data-mode="mc">Multiple Choice</button>
+    <button class="mode-btn" data-mode="type">Type the Answer</button>
+    <button class="mode-btn" data-mode="flash">Flashcards</button>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <div class="stats">
+    <span>Score: <b id="scoreDisplay">0</b>/<span id="totalDisplay">0</span></span>
+    <span>Streak: <b id="streakDisplay">0</b> 🔥</span>
+  </div>
+
+  <div class="card" id="card">
+    <!-- populated by JS -->
+  </div>
+
+  <div class="footer-note">Tap a mode above anytime to switch. Score resets when you switch modes.</div>
+</div>
+
+<script>
+const verbs = [
+  ["be","was/were","been"],["beat","beat","beaten"],["become","became","become"],
+  ["begin","began","begun"],["bend","bent","bent"],["bet","bet","bet"],
+  ["bite","bit","bitten"],["bleed","bled","bled"],["blow","blew","blown"],
+  ["break","broke","broken"],["bring","brought","brought"],["build","built","built"],
+  ["burn","burnt/burned","burnt/burned"],["buy","bought","bought"],["catch","caught","caught"],
+  ["choose","chose","chosen"],["come","came","come"],["cost","cost","cost"],
+  ["cut","cut","cut"],["dig","dug","dug"],["do","did","done"],
+  ["draw","drew","drawn"],["dream","dreamt/dreamed","dreamt/dreamed"],["drink","drank","drunk"],
+  ["drive","drove","driven"],["eat","ate","eaten"],["fall","fell","fallen"],
+  ["feed","fed","fed"],["feel","felt","felt"],["fight","fought","fought"],
+  ["find","found","found"],["fly","flew","flown"],["forget","forgot","forgotten"],
+  ["forgive","forgave","forgiven"],["freeze","froze","frozen"],["get","got","got"],
+  ["give","gave","given"],["go","went","gone"],["grow","grew","grown"],
+  ["hang","hanged/hung","hanged/hung"],["have","had","had"],["hear","heard","heard"],
+  ["hide","hid","hidden"],["hit","hit","hit"],["hold","held","held"],
+  ["hurt","hurt","hurt"],["keep","kept","kept"],["know","knew","known"],
+  ["lay","laid","laid"],["lead","led","led"],["learn","learnt/learned","learnt/learned"],
+  ["leave","left","left"],["lend","lent","lent"]
+];
+
+const forms = ["Base Form (V1)", "Past Simple (V2)", "Past Participle (V3)"];
+
+let mode = "mc";
+let score = 0, total = 0, streak = 0;
+let currentAnswerSet = []; // accepted correct answers (for slash variants)
+let currentTargetIdx = 0; // which column is asked
+let currentVerbRow = [];
+let flashFlipped = false;
+let answered = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function acceptedAnswers(str) {
+  return str.split("/").map(s => s.trim().toLowerCase());
+}
+
+function pickTargetColumn() {
+  // 0 = base given -> ask past simple or past participle
+  // randomly ask for V2 or V3, given V1
+  return Math.random() < 0.5 ? 1 : 2;
+}
+
+function newQuestion() {
+  answered = false;
+  currentVerbRow = verbs[Math.floor(Math.random() * verbs.length)];
+  currentTargetIdx = pickTargetColumn();
+  currentAnswerSet = acceptedAnswers(currentVerbRow[currentTargetIdx]);
+  renderCard();
+}
+
+function updateStats() {
+  document.getElementById("scoreDisplay").textContent = score;
+  document.getElementById("totalDisplay").textContent = total;
+  document.getElementById("streakDisplay").textContent = streak;
+  const pct = total > 0 ? Math.min(100, (total % 10) * 10) : 0;
+  document.getElementById("progressFill").style.width = (total === 0 ? 0 : pct) + "%";
+}
+
+function renderCard() {
+  const card = document.getElementById("card");
+  const base = currentVerbRow[0];
+  const targetLabel = forms[currentTargetIdx];
+
+  if (mode === "mc") {
+    document.getElementById("subtitle").textContent = "Choose the correct " + targetLabel;
+    // build choices: correct + 3 distractors from other verbs' same column
+    const correctFull = currentVerbRow[currentTargetIdx];
+    let pool = verbs
+      .filter(v => v[0] !== base)
+      .map(v => v[currentTargetIdx]);
+    pool = shuffle(pool).slice(0, 3);
+    const choices = shuffle([correctFull, ...pool]);
+
+    card.innerHTML = `
+      <div class="prompt-label">Base Form</div>
+      <div class="prompt-word">${base}</div>
+      <div class="prompt-forms">What is the <b>${targetLabel}</b>?</div>
+      <div class="choices" id="choicesWrap"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="actions">
+        <button class="main-btn" id="nextBtn" disabled>Next →</button>
+      </div>
+    `;
+    const wrap = document.getElementById("choicesWrap");
+    choices.forEach(choice => {
+      const btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.textContent = choice;
+      btn.onclick = () => handleMCAnswer(btn, choice, correctFull, wrap);
+      wrap.appendChild(btn);
+    });
+  } else if (mode === "type") {
+    document.getElementById("subtitle").textContent = "Type the correct " + targetLabel;
+    card.innerHTML = `
+      <div class="prompt-label">Base Form</div>
+      <div class="prompt-word">${base}</div>
+      <div class="prompt-forms">Type the <b>${targetLabel}</b></div>
+      <input type="text" id="typeInput" placeholder="type here..." autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="feedback" id="feedback"></div>
+      <div class="actions">
+        <button class="main-btn" id="checkBtn">Check</button>
+        <button class="secondary-btn" id="skipBtn">Skip</button>
+      </div>
+    `;
+    const input = document.getElementById("typeInput");
+    input.focus();
+    input.addEventListener("keydown", e => { if (e.key === "Enter") checkTypeAnswer(); });
+    document.getElementById("checkBtn").onclick = checkTypeAnswer;
+    document.getElementById("skipBtn").onclick = () => { total++; streak = 0; updateStats(); newQuestion(); };
+  } else if (mode === "flash") {
+    document.getElementById("subtitle").textContent = "Tap the card to flip";
+    flashFlipped = false;
+    card.innerHTML = `
+      <div class="prompt-label">Base Form (V1)</div>
+      <div class="prompt-word" id="flashFront">${base}</div>
+      <div class="prompt-forms" id="flashBack" style="display:none;">
+        <b>V2:</b> ${currentVerbRow[1]} &nbsp;•&nbsp; <b>V3:</b> ${currentVerbRow[2]}
+      </div>
+      <div class="feedback"></div>
+      <div class="actions">
+        <button class="secondary-btn" id="flipBtn">Flip 🔄</button>
+        <button class="main-btn" id="flashNextBtn">Next →</button>
+      </div>
+    `;
+    document.getElementById("flipBtn").onclick = () => {
+      flashFlipped = !flashFlipped;
+      document.getElementById("flashBack").style.display = flashFlipped ? "block" : "none";
+      document.getElementById("flashFront").style.display = flashFlipped ? "none" : "block";
+      document.querySelector(".prompt-label").textContent = flashFlipped ? "Past Simple & Past Participle" : "Base Form (V1)";
+    };
+    document.getElementById("flashNextBtn").onclick = () => { total++; updateStats(); newQuestion(); };
+  }
+  updateStats();
+}
+
+function handleMCAnswer(btn, choice, correctFull, wrap) {
+  if (answered) return;
+  answered = true;
+  total++;
+  const isCorrect = choice === correctFull;
+  if (isCorrect) { score++; streak++; }
+  else { streak = 0; }
+  [...wrap.children].forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correctFull) b.classList.add("correct");
+    else if (b === btn) b.classList.add("wrong");
+  });
+  const fb = document.getElementById("feedback");
+  fb.textContent = isCorrect ? "✅ Correct!" : "❌ Correct answer: " + correctFull;
+  fb.className = "feedback " + (isCorrect ? "correct" : "wrong");
+  document.getElementById("nextBtn").disabled = false;
+  document.getElementById("nextBtn").onclick = () => { updateStats(); newQuestion(); };
+  updateStats();
+}
+
+function checkTypeAnswer() {
+  if (answered) return;
+  answered = true;
+  const input = document.getElementById("typeInput");
+  const val = input.value.trim().toLowerCase();
+  total++;
+  const isCorrect = currentAnswerSet.includes(val) && val.length > 0;
+  if (isCorrect) { score++; streak++; }
+  else { streak = 0; }
+  const fb = document.getElementById("feedback");
+  fb.textContent = isCorrect ? "✅ Correct!" : "❌ Correct answer: " + currentVerbRow[currentTargetIdx];
+  fb.className = "feedback " + (isCorrect ? "correct" : "wrong");
+  input.disabled = true;
+  document.getElementById("checkBtn").textContent = "Next →";
+  document.getElementById("checkBtn").onclick = () => { updateStats(); newQuestion(); };
+  document.getElementById("skipBtn").style.display = "none";
+  updateStats();
+}
+
+document.querySelectorAll(".mode-btn").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    mode = btn.dataset.mode;
+    score = 0; total = 0; streak = 0;
+    updateStats();
+    newQuestion();
+  };
+});
+
+newQuestion();
+</script>
+</body>
+</html>
